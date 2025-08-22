@@ -41,7 +41,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
     },
     "EndWorkflow": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:eu-west-3:195044943814:function:end_workflow_lambda",
+      "Resource": "arn:aws:lambda:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:function:end_workflow_lambda",
       "Parameters": {
         "input_bucket.$": "$.files_to_process[0].input_bucket",
         "s3_key.$": "$.files_to_process[0].s3_key",
