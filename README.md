@@ -1,13 +1,19 @@
 ## Part 2 – Decoupled Architecture for Batch Ingestion  
 
+#### NOTE : THIS README WAS WRITTEN MANUALLY WITHOUT THE USE OF ANY GEN AI TOOL. PLEASE TAKE THE TIME TO READ IT, AS I PUT EFFORT INTO WRITING IT RATHER THAN JUST TELLING CHATGPT TO DO IT FOR ME 🙂 .
+
+
 **Note:** Make sure to check out the [Version 1 repository](https://github.com/hamzabel99/Data_Ingestion_V1) first, as it’s essential to understand the foundation before diving into Version 2.
 
 ![Pipeline Architecture](Arcdhitecture%20Ingestion%20V2.png)
 
 In the first version, the architecture was fully functional but tightly coupled: every uploaded file could trigger a Glue job directly.  
 
-In this second version, the architecture is restructured to decouple ingestion from processing. Instead of running a Glue job for each single file (and nobody really wants a Spark job billed just to process one file), files are now collected and processed in batch.  
+In this second version, the architecture was rethinked and decoupled in two part : 
+  - The first part write the "to be processed" files metadata in the first worflow_status DynamoDB table.
+  - The second part, is triggered on a schedule and scan the worflow_status table. If we it can find enough similar files(that are supposed to run on the same worflow aka the same stepfunction), it trigger the designated stepfunction.
+  - Instead of running a Glue job for each single file (and nobody really wants a Spark job billed just to process one file), files are now collected and processed in batch.  
 
 This design is more cost-efficient, scalable, and aligned with real-world ingestion patterns.  
 
-This batch job is managed through the WorkflowMetadata table: for each prefix, we’ll have a Step Function, along with a batchSize column that we can control to decide how many files are required before the pipeline kicks off.
+This batch job is managed through the Workflow_metadata table: for each prefix, we’ll have a Step Function, along with a batchSize column that we can control to decide how many files are required before the pipeline kicks off.
